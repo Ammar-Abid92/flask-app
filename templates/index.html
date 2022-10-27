@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+
+<center>
+    <h2>Upload Image</h2><br>
+    <section class="upload">
+        <div>
+            <div class="img-preview">
+                <p><img id="output" width="400" /></p>
+            </div>
+            <div>
+                <form id="upload" action="/" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input required type="text" placeholder="Write Name" id="name" name="name">
+                        <input required type="text" placeholder="Write Age" id="age" name="age">
+                        <label for="gender">Choose your gender:</label>
+                        <select name="gender" id="gender">
+                            <option value="male">male</option>
+                            <option value="female">female</option>
+                            <option value="other">other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="file" id="image" name="image" onchange="loadFile(event)">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id='predict' class="btn btn-primary"
+                            style="display: none;">Analyze</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="Predictions">
+        <div>
+            {% if predictions %}
+            <button type="button" class="btn btn-success">NEGATIVE: {{predictions.negative}}</button>
+            <button type="button" class="btn btn-danger">POSITIVE: {{predictions.positive}}</button>
+            {% endif %}
+        </div>
+    </section>
+
+    <div>
+        <form id="upload" action="/data" method="GET" enctype="multipart/form-data">
+            <div class="form-group">
+                <button type="submit" id='predict' class="btn btn-primary">
+                    Get Data
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <section class="">
+        <div>
+            {% if reportData %}
+            <table>
+                <tr>
+                    <td>Name</td>
+                    <td>Age</td>
+                    <td>Gender</td>
+                    <td>Pneumonia</td>
+                </tr>
+                {% for item in reportData %}
+                <tr>
+                    <td>{{item['name']}}</td>
+                    <td>{{item['age']}}</td>
+                    <td>{{item['gender']}}</td>
+                    <td>{{item['pneumonia']}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+    </section>
+
+    <script>
+        // load image from local strorage
+        window.onload = function () {
+            let profileImage = localStorage.getItem("profileImageData");
+            if (profileImage !== null) {
+                document.getElementById("output").src = profileImage
+            }
+        }
+
+        // preview loaded image
+        const loadFile = function (event) {
+            document.getElementById('predict').style.display = 'block'
+            let image = document.getElementById('output');
+            image.src = URL.createObjectURL(event.target.files[0]);
+        };
+
+        // save loaded image to local storage
+        document.getElementById("image").addEventListener('change', function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                localStorage.setItem("profileImageData", reader.result);
+            };
+        });
+    </script>
+</center><br><br>
+{% endblock %}
